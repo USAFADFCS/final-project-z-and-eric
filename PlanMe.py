@@ -25,33 +25,12 @@ def generate_schedule(prompt, model, tokenizer):
 
 def parse_schedule(raw_text, model, tokenizer):
     instruction = (
-        "Reformat this text into a numbered daily schedule.\n"
-        "Follow this style of formatting (but do NOT copy the times or tasks):\n"
-        "1. [Activity] from [start time]–[end time]\n"
-        "2. [Activity] from [start time]–[end time]\n"
-        "If a duration is given (like 'sleep 7 hours from 2100'), convert it to an end time.\n"
-        "Use clean, human-readable time ranges.\n\n"
-        f"Text to clean and format:\n{raw_text}\n\n"
-        "Return only the final numbered schedule — no examples, no explanations."
+        f"Clean and format this text as a numbered daily schedule. "
+        f"Use this exact style:\n"
+        f"1. Classes from 0800–1300\n2. Gym 1400–1530\n3. Homework 1800–2100\n4. Sleep 7 hours from 2200\n\n"
+        f"Text to clean:\n{raw_text}\n\n"
+        f"Return only the cleaned schedule. No explanations, examples, or repeated text."
     )
-
-    inputs = tokenizer(instruction, return_tensors="pt", truncation=True)
-    outputs = model.generate(**inputs, max_new_tokens=200)
-    text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-    # Extract only numbered lines
-    lines = [l.strip() for l in text.splitlines() if l.strip().startswith(tuple(str(i) + "." for i in range(1, 10)))]
-
-    # Remove duplicates
-    seen = set()
-    unique_lines = []
-    for line in lines:
-        if line not in seen:
-            seen.add(line)
-            unique_lines.append(line)
-
-    return "\n".join(unique_lines) if unique_lines else text.strip()
-
 
     inputs = tokenizer(instruction, return_tensors="pt", truncation=True)
     outputs = model.generate(**inputs, max_new_tokens=200)
@@ -69,23 +48,6 @@ def parse_schedule(raw_text, model, tokenizer):
             unique_lines.append(line)
 
     return "\n".join(unique_lines) if unique_lines else text.strip()
-
-
-    inputs = tokenizer(instruction, return_tensors="pt", truncation=True)
-    outputs = model.generate(**inputs, max_new_tokens=200)
-    text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-    # Post-cleaning: keep only lines starting with a number and dot
-    cleaned_lines = []
-    for line in text.splitlines():
-        if line.strip().startswith(tuple(str(i) + "." for i in range(1, 10))):
-            cleaned_lines.append(line.strip())
-
-    if cleaned_lines:
-        return "\n".join(cleaned_lines)
-    else:
-        return text.strip()
-
 
 def main():
     scheduler_model, scheduler_tokenizer, parser_model, parser_tokenizer = load_models()
