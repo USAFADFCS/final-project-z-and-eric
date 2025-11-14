@@ -156,3 +156,13 @@ Ryan R (rrabinow@uccs.edu)
 Austin W (austin.w@ardentinc.com)
 Eli G (elijah.g@ardentinc.com)
 Chad M (Chad.Mello@afacademy.af.edu)
+
+# API Key Setup
+This project requires an OpenAI API key.
+
+1. Create a `.env` file in the project root.
+2. Add the following line:
+
+OPENAI_API_KEY=your_key_here
+
+3. The code will automatically load the key using python-dotenv.
